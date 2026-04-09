@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Queue</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .queue-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .queue-header {
+            background: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+        }
+
+        .queue-header h1 {
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .queue-number {
+            font-size: 72px;
+            font-weight: 800;
+            line-height: 1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+
+        .queue-status {
+            font-size: 14px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .queue-content {
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .status-card {
+            background: #f5f5f5;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .status-card h3 {
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .position-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .info-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #4fb559;
+        }
+
+        .info-section p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .info-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .priority-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #fff3cd;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .priority-section h4 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .position-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .position-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 80px;
+        }
+
+        .priority-btn {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .priority-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .priority-btn:active {
+            transform: translateY(0);
+        }
+
+        .nav-btn {
+            background-color: white;
+            color: #4fb559;
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(79, 181, 89, 0.18);
+        }
+
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4fb559;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-section {
+            display: none;
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .success-section.show {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounce 0.6s ease-out;
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .success-section h2 {
+            color: #4fb559;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .success-section p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .queue-footer {
+            padding: 20px 30px;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .counter {
+            display: inline-block;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: #666;
+            font-weight: 600;
+            font-size: 13px;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 480px) {
+            .queue-number {
+                font-size: 56px;
+            }
+
+            .queue-header {
+                padding: 40px 20px;
+            }
+
+            .queue-content {
+                padding: 30px 20px;
+            }
+
+            .status-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="queue-container">
+        <div class="queue-header">
+            <h1 id="headerTitle">Join the Queue</h1>
+            <div class="queue-number" id="assignedUid" style="display:none"></div>
+            <div class="queue-status">Fill in your details to get a queue number</div>
+        </div>
+
+        <div class="queue-content">
+            <div id="step1" class="info-section">
+                <h3 style="margin-bottom:12px">1. Your Details</h3>
+                <p><input type="text" id="name" placeholder="Full name" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:6px"></p>
+                <p><input type="tel" id="phone" placeholder="Phone number" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:6px"></p>
+                <p><input type="email" id="email" placeholder="Email (optional)" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:6px"></p>
+                <p>
+                    <label style="display:block;margin-bottom:6px">Priority Type</label>
+                    <select id="priority" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px">
+                        <option value="normal">Normal</option>
+                        <option value="emergency">Emergency</option>
+                        <option value="pwd_senior">PWD / Senior Citizen</option>
+                    </select>
+                </p>
+                <p style="text-align:right;margin-top:10px">
+                    <button class="nav-btn" onclick="goToStep2()">Next</button>
+                </p>
+            </div>
+
+            <div id="step2" class="info-section" style="display:none">
+                <h3 style="margin-bottom:12px">2. Select Service</h3>
+                <p>
+                    <select id="service" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px">
+                        <option value="registration">Registration</option>
+                        <option value="consultation">Consultation</option>
+                        <option value="laboratory">Laboratory</option>
+                        <option value="radiology">Radiology</option>
+                        <option value="pharmacy">Pharmacy</option>
+                        <option value="cashier">Cashier</option>
+                        <option value="other">Other</option>
+                    </select>
+                </p>
+                <p style="text-align:right;margin-top:10px">
+                    <button class="nav-btn" onclick="goToStep1()" style="margin-right:8px;background:#eee;color:#333">Back</button>
+                    <button class="nav-btn" onclick="submitJoin()">Get My Number</button>
+                </p>
+            </div>
+
+            <div id="waitingSection" style="display:none">
+                <div class="loading-spinner"></div>
+                <h2 style="color: #333; font-size: 20px; margin-bottom: 15px;">You are in the queue</h2>
+
+                <div class="status-card">
+                    <h3>Your Position</h3>
+                    <h3>Average Waiting Time : <span id="avtPlaceholder">{{ avt }}</span></h3>
+                    <div class="position-badge" id="positionBadge">Connecting...</div>
+                    <div class="counter" id="positionCounter"></div>
+                </div>
+
+                <div class="priority-section">
+                    <h4>Priority Queue Request</h4>
+                    <p style="color: #856404; font-size: 14px; margin-bottom: 12px;">Request to move to a different position in the queue (optional):</p>
+                    <div class="position-controls">
+                        <input type="number" id="newPosition" class="position-input" placeholder="New position" min="0">
+                        <button class="priority-btn" onclick="changePosition()">Move to Position</button>
+                    </div>
+                    <p style="color: #856404; font-size: 12px; margin-top: 10px;">Position 0 is first in line</p>
+                </div>
+            </div>
+
+            <div id="successSection" class="success-section" style="display:none">
+                <h2>You're Registered</h2>
+                <p style="color: #666; margin-bottom: 25px;">Your number <strong id="finalUid"></strong> has been issued</p>
+                <p style="color: #999; font-size: 14px;">Please keep this number safe. You'll be notified when it's your turn.</p>
+            </div>
+        </div>
+
+        <div class="queue-footer">
+            <p>Stay updated - your number will appear at the top when called</p>
+        </div>
+    </div>
+
+    <script>
+        let uid = null;
+        const protocol = window.location.protocol;
+        const hostname = window.location.hostname;
+        const port = window.location.port ? ':' + window.location.port : '';
+        const serverUrl = `${protocol}//${hostname}${port}`;
+        let socket = null;
+
+        function connectSocket() {
+            if (!uid) return;
+            if (socket) {
+                try { socket.disconnect(); } catch(e){}
+                socket = null;
+            }
+
+            socket = io(serverUrl, {
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+                reconnectionAttempts: 5,
+                transports: ['websocket', 'polling']
+            });
+
+            socket.on('connect', () => {
+                console.log('Socket connected');
+                socket.emit("register", { uid: uid });
+                const el = document.getElementById('positionBadge');
+                if (el) el.textContent = 'Connected - waiting for your turn...';
+            });
+
+            socket.on('connect_error', (error) => {
+                console.error('Connection error:', error);
+                const el = document.getElementById('positionBadge');
+                if (el) el.textContent = 'Connection issue - retrying...';
+            });
+
+            socket.on("served", data => {
+                console.log('Served event:', data);
+                if (!uid) return;
+                if (data.uid === uid) {
+                    document.getElementById('waitingSection').style.display = 'none';
+                    const success = document.getElementById('successSection');
+                    success.style.display = 'block';
+                    success.classList.add('show');
+
+                    try {
+                        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBg==');
+                        audio.play().catch(err => console.log('Audio failed'));
+                    } catch (e) {
+                        console.log('Audio error');
+                    }
+                }
+            });
+
+            socket.on('disconnect', () => {
+                console.log('Disconnected');
+                const el = document.getElementById('positionBadge');
+                if (el) el.textContent = 'Disconnected - reconnecting...';
+            });
+        }
+
+        function goToStep2() {
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            if (!name) { alert('Please enter your name'); return; }
+            if (!phone) { alert('Please enter your phone number'); return; }
+
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+            document.getElementById('headerTitle').textContent = 'Select Service';
+        }
+
+        function goToStep1() {
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step1').style.display = 'block';
+            document.getElementById('headerTitle').textContent = 'Join the Queue';
+        }
+
+        function submitJoin() {
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const priority = document.getElementById('priority').value;
+            const service = document.getElementById('service').value;
+
+            if (!name || !phone || !service) {
+                alert('Please complete the form');
+                return;
+            }
+
+            fetch('/join', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phone, email, priority, service })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (!data || !data.success) {
+                    alert('Failed to join queue');
+                    return;
+                }
+                uid = data.uid;
+                document.getElementById('finalUid').textContent = uid;
+                const assigned = document.getElementById('assignedUid');
+                assigned.textContent = uid;
+                assigned.style.display = 'block';
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('successSection').style.display = 'block';
+                document.getElementById('waitingSection').style.display = 'block';
+                document.getElementById('headerTitle').textContent = 'Your Queue Number';
+                document.getElementById('avtPlaceholder').textContent = data.avt || '{{ avt }}';
+
+                // connect socket and register
+                connectSocket();
+            })
+            .catch(err => {
+                console.error('Join error', err);
+                alert('Error joining queue');
+            });
+        }
+
+        function changePosition() {
+            if (!uid) { alert('You must have a queue number to request priority'); return; }
+            const newPosition = document.getElementById('newPosition').value;
+            if (newPosition === '' || newPosition === null) {
+                alert('Please enter a position number');
+                return;
+            }
+
+            fetch('/request-priority', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ uid: uid, position: parseInt(newPosition) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Request submitted! Waiting for admin approval...');
+                    document.getElementById('newPosition').value = '';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to submit request');
+            });
+        }
+    </script>
+</body>
+</html>

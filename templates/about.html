@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - QMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .navbar-logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-logo:hover {
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-item a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-item a.active {
+            background-color: rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+        }
+
+        .nav-btn {
+            background-color: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .about-content {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .about-content h3 {
+            color: #4fb559;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .about-content p {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .features-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .features-list li {
+            padding: 10px 0;
+            color: #666;
+            border-bottom: 1px solid #eee;
+        }
+
+        .features-list li:before {
+            content: "✓ ";
+            color: #4fb559;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                gap: 15px;
+            }
+
+            .nav-item a {
+                font-size: 14px;
+            }
+
+            .page-header {
+                padding: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 24px;
+            }
+
+            .about-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo">
+                PNC Healthcare System
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/home">Home</a></li>
+                <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
+                <li class="nav-item"><a href="/reports">Reports</a></li>
+                <li class="nav-item"><a href="/about" class="active">About</a></li>
+                <li class="nav-item"><a href="/display">Join</a></li>
+                <li class="nav-item"><a href="/priority-requests">Requests</a></li>
+                <li class="nav-item"><a href="/" class="nav-btn">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>About QMS</h1>
+            <p>Quality Management System for Modern Healthcare</p>
+        </div>
+
+        <div class="about-content">
+            <h3>What is QMS?</h3>
+            <p>
+                The Quality Management System (QMS) is a comprehensive solution designed to streamline queue management
+                and customer service operations. Built with modern technologies, it provides real-time insights and
+                efficient workflow management for healthcare facilities and service centers.
+            </p>
+
+            <h3>Key Features</h3>
+            <ul class="features-list">
+                <li>Real-time queue management and monitoring</li>
+                <li>QR code integration for easy customer joining</li>
+                <li>Comprehensive analytics and reporting</li>
+                <li>WebSocket-based live updates</li>
+                <li>User-friendly interface</li>
+                <li>Secure and scalable architecture</li>
+            </ul>
+
+            <h3>Technology Stack</h3>
+            <p>
+                QMS is built using Flask for the backend, providing a robust and scalable foundation. The frontend
+                utilizes modern HTML5, CSS3, and JavaScript for an interactive user experience. Real-time communication
+                is powered by WebSockets through Flask-SocketIO.
+            </p>
+
+            <h3>Our Mission</h3>
+            <p>
+                To provide healthcare facilities and service centers with intelligent queue management solutions that
+                improve customer satisfaction, operational efficiency, and overall service quality.
+            </p>
+
+            <h3>Support & Contact</h3>
+            <p>
+                For support, questions, or feedback, please contact our support team at
+                <strong>support@pnchcs.com</strong> or visit our help center.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function initBadges() {
+            updateQueueBadge();
+            updateRequestsBadge();
+        }
+
+        function updateQueueBadge() {
+            fetch("/api/queue-count")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('queueBadge').textContent = data.count || 0;
+                })
+                .catch(error => console.error("Error fetching queue count:", error));
+        }
+
+        function updateRequestsBadge() {
+            fetch("/api/priority-requests")
+                .then(response => response.json())
+                .then(data => {
+                    const requestCount = Object.keys(data).length;
+                    document.getElementById('requestsBadge').textContent = requestCount;
+                })
+                .catch(error => console.error("Error fetching requests:", error));
+        }
+
+        window.addEventListener('DOMContentLoaded', initBadges);
+        setInterval(() => {
+            updateQueueBadge();
+            updateRequestsBadge();
+        }, 3000);
+    </script>
+</body>
+</html>

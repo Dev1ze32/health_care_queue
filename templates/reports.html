@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - QMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .navbar-logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-logo:hover {
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-item a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-item a.active {
+            background-color: rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+        }
+
+        .nav-btn {
+            background-color: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-icon {
+            font-size: 40px;
+            flex-shrink: 0;
+        }
+
+        .stat-content h3 {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .report-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .report-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .report-card p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .report-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .report-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .table-wrapper {
+            width: 100%;
+            max-width: 100%;
+            height: 350px;            
+            overflow-y: auto;          
+            overflow-x: auto;         
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .history-table thead th {
+            position: sticky;
+            top: 0;
+            background: #f0f0f0;
+            z-index: 1;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                gap: 15px;
+            }
+
+            .nav-item a {
+                font-size: 14px;
+            }
+
+            .page-header {
+                padding: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo">
+                PNC Healthcare System
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/home">Home</a></li>
+                <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
+                <li class="nav-item"><a href="/reports" class="active">Reports</a></li>
+                <li class="nav-item"><a href="/about">About</a></li>
+                <li class="nav-item"><a href="/display">Join</a></li>
+                <li class="nav-item"><a href="/priority-requests">Requests</a></li>
+                <li class="nav-item"><a href="/" class="nav-btn">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Reports & Statistics</h1>
+            <p>Real-time queue management statistics and analytics</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>Current Queue Length</h3>
+                    <div class="stat-value">{{ queue_length }}</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>Total Customers Served</h3>
+                    <div class="stat-value">{{ served_ctr }}</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>Average Wait Time</h3>
+                    <div class="stat-value">{{ avt }}</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>Total Processed</h3>
+                    <div class="stat-value">{{ total_processed }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-card">
+            <h3>Queue Status Summary</h3>
+            <p><strong>Current Queue Length:</strong> {{ queue_length }} customer{{ 's' if queue_length != 1 else '' }} waiting</p>
+            <p><strong>Customers Served At This Instance:</strong> {{ served_ctr }}</p>
+            <p><strong>Average Service Wait Time:</strong> {{ avt }}</p>
+        </div>
+
+        <div class="report-card">
+            <h3>System Information</h3>
+            <p>The queue management system is operating normally. Real-time statistics are being tracked and updated continuously.</p>
+            <p>Use the Dashboard page to view the current queue list and manage customer flow.</p>
+        </div>
+
+        <div class="report-card">
+            <h3>Queue History</h3>
+            <div class="table-wrapper">
+                <table class="history-table" style="width:100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background:#f0f0f0;">
+                            <th style="padding:10px; text-align:left;">Ticket #</th>
+                            <th style="padding:10px; text-align:left;">Customer</th>
+                            <th style="padding:10px; text-align:left;">Phone</th>
+                            <th style="padding:10px; text-align:left;">Email</th>
+                            <th style="padding:10px; text-align:left;">Service</th>
+                            <th style="padding:10px; text-align:left;">Priority</th>
+                            <th style="padding:10px; text-align:left;">Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in queue_history %}
+                        <tr style="border-bottom:1px solid #ddd;">
+                            <td style="padding:10px;">{{ row.uid }}</td>
+                            <td style="padding:10px;">{{ row.name }}</td>
+                            <td style="padding:10px;">{{ row.phone }}</td>
+                            <td style="padding:10px">
+                                {{ row.email if row.email else "N/A" }}
+                            </td>
+                            <td style="padding:10px">{{ row.service }}</td>
+                            <td style="padding:10px">{{ row.priority }}</td>
+                            <td style="padding:10px;">{{ row.served_at[:19].replace("T", " ") }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" style="padding:10px; text-align:center; color:#777;">
+                                No history available
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+        </div>
+
+        <div class="report-card">
+            <h3>Customer History</h3>
+            <div class="table-wrapper">
+                <table class="history-table" style="width:100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background:#f0f0f0;">
+                            <th style="padding:10px; text-align:left;">Name</th>
+                            <th style="padding:10px; text-align:left;">Phone Number</th>
+                            <th style="padding:10px; text-align:left;">Email Address</th>
+                            <th style="padding:10px; text-align:left;">Priority Type</th>
+                            <th style="padding:10px; text-align:left;">Department</th>
+                            <th style="padding:10px; text-align:left;">Served at</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in customer_history %}
+                        <tr style="border-bottom:1px solid #ddd;">
+                            <td style="padding:10px;">{{ row.full_name }}</td>
+                            <td style="padding:10px;">{{ row.phone_number }}</td>
+                            <td style="padding:10px">
+                                {{ row.email if row.email else "N/A" }}
+                            </td>
+                            <td style="padding:10px">{{ row.priority_type }}</td>
+                            <td style="padding:10px;">{{ row.department }}</td>
+                            <td style="padding:10px;">{{ row.served_time[:19].replace("T", " ") }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" style="padding:10px; text-align:center; color:#777;">
+                                No history available
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+        </div>
+    </div>
+
+    <script>
+        function initBadges() {
+            updateQueueBadge();
+            updateRequestsBadge();
+        }
+
+        function updateQueueBadge() {
+            fetch("/api/queue-count")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('queueBadge').textContent = data.count || 0;
+                })
+                .catch(error => console.error("Error fetching queue count:", error));
+        }
+
+        function updateRequestsBadge() {
+            fetch("/api/priority-requests")
+                .then(response => response.json())
+                .then(data => {
+                    const requestCount = Object.keys(data).length;
+                    document.getElementById('requestsBadge').textContent = requestCount;
+                })
+                .catch(error => console.error("Error fetching requests:", error));
+        }
+
+        window.addEventListener('DOMContentLoaded', initBadges);
+        setInterval(() => {
+            updateQueueBadge();
+            updateRequestsBadge();
+        }, 3000);
+    </script>
+</body>
+</html>

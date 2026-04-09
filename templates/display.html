@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Display - QMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .navbar-logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-logo:hover {
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-item a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-item a.active {
+            background-color: rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+        }
+
+        .nav-btn {
+            background-color: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            min-height: calc(100vh - 90px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-header {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* Currently serving card */
+        .serving-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: left;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .serving-title {
+            font-size: 14px;
+            color: #666;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .serving-number {
+            font-size: 48px;
+            font-weight: 800;
+            color: #1b5e20;
+        }
+
+        .serving-name {
+            font-size: 20px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .serving-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .complete-btn, .recall-btn, .noshow-btn, .refresh-btn {
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .complete-btn { background: linear-gradient(135deg,#4fb559 0%,#61b776 100%); color: white; }
+        .recall-btn { background: linear-gradient(135deg,#ffd54f 0%,#ffb300 100%); color: #333; }
+        .noshow-btn { background: linear-gradient(135deg,#ef9a9a 0%,#e57373 100%); color: white; }
+        .refresh-btn { background: #ffffff; border: 1px solid #ddd; color: #333; }
+
+        .display-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex: 1 1 auto;
+            align-items: start;
+        }
+
+        .qr-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .qr-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .qr-code {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #eee;
+            display: inline-block;
+        }
+
+        .qr-code img {
+            width: 250px;
+            height: 250px;
+            display: block;
+        }
+
+        .qr-info {
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .queue-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            overflow: auto;
+        }
+
+        .queue-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .queue-list {
+            list-style: none;
+            max-height: calc(100vh - 320px);
+            overflow-y: auto;
+        }
+
+        .queue-list li {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f9f9f9;
+            border-left: 4px solid #4fb559;
+            border-radius: 4px;
+            color: #333;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .queue-list li:first-child {
+            background: #e8f5e9;
+            border-left-color: #2e7d32;
+            color: #1b5e20;
+        }
+
+        .queue-list li.empty {
+            text-align: center;
+            color: #999;
+            border: none;
+            background: #fafafa;
+            display: block;
+        }
+
+        .move-up-btn {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .move-up-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .move-up-btn:active {
+            transform: translateY(0);
+        }
+
+        .move-up-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .controls {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            color: white;
+            padding: 15px 50px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 181, 89, 0.3);
+        }
+
+        .next-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .display-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-menu {
+                gap: 15px;
+            }
+
+            .nav-item a {
+                font-size: 14px;
+            }
+
+            .page-header {
+                padding: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 24px;
+            }
+
+            .qr-code img {
+                width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo">
+                ✚ PNC Healthcare System
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/home">Home</a></li>
+                <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
+                <li class="nav-item"><a href="/reports">Reports</a></li>
+                <li class="nav-item"><a href="/about">About</a></li>
+                <li class="nav-item"><a href="/display" class="active">Join</a></li>
+                <li class="nav-item"><a href="/priority-requests">Requests</a></li>
+                <li class="nav-item"><a href="/" class="nav-btn">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="serving-card">
+            <div class="serving-title">Currently Serving Customer</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap">
+                <div>
+                    <div class="serving-number" id="servingNumber">—</div>
+                    <div class="serving-name" id="servingName">No one is being served</div>
+                </div>
+                <div class="serving-actions">
+                    <button class="next-btn" id="callNextBtn" onclick="nextCustomer()">Call Next</button>
+                    <button class="complete-btn" id="completeBtn" onclick="completeCustomer()">Complete</button>
+                    <button class="recall-btn" id="recallBtn" onclick="recallCustomer()">Recall</button>
+                    <button class="noshow-btn" id="noShowBtn" onclick="noShowCustomer()">No show</button>
+                    <button class="refresh-btn" id="refreshBtn" onclick="fetchCurrentServing()">Refresh</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="display-grid">
+            <div class="qr-section">
+                <h3>Scan to Join Queue</h3>
+                <div class="qr-code">
+                    <img src="/static/qr.png" alt="QR Code to join queue">
+                </div>
+                <div class="qr-info">
+                    <p>Customers can scan this QR code to join the queue</p>
+                </div>
+            </div>
+
+            <div class="queue-section">
+                <h3>Current Queue Status</h3>
+                <ul class="queue-list" id="queueList">
+                    {% if queue %}
+                        {% for item in queue %}
+                            <li>
+                                <span>{{ item }}</span>
+                                <button class="move-up-btn" onclick="moveUp('{{ item }}')" {% if loop.first %}disabled{% endif %}>↑ Move Up</button>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="empty">No customers in queue</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        function initBadges() {
+            updateQueueBadge();
+            updateRequestsBadge();
+            fetchCurrentServing();
+        }
+
+        function updateQueueBadge() {
+            const queueList = document.getElementById('queueList');
+            if (queueList) {
+                const isEmpty = queueList.querySelector('.empty');
+                const badge = document.getElementById('queueBadge');
+                if (badge) {
+                    badge.textContent = isEmpty ? '0' : queueList.children.length;
+                }
+            }
+        }
+
+        function updateRequestsBadge() {
+            fetch("/api/priority-requests")
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('requestsBadge');
+                    if (badge) {
+                        badge.textContent = Object.keys(data.requests).length;
+                    }
+                })
+                .catch(err => console.error("Error fetching requests:", err));
+        }
+
+        const protocol = window.location.protocol;
+        const hostname = window.location.hostname;
+        const port = window.location.port ? ':' + window.location.port : '';
+        const serverUrl = `${protocol}//${hostname}${port}`;
+
+        let socket = io(serverUrl, { transports: ['websocket', 'polling'] });
+        socket.on('connect', () => console.log('Display socket connected'));
+        socket.on('served', data => {
+            // update current serving when a served event arrives; include client info when provided
+            if (data && data.uid) {
+                setCurrentServing(data.uid, data.client);
+            }
+        });
+
+        function fetchCurrentServing() {
+            fetch('/api/current-serving')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.uid) setCurrentServing(data.uid, data.client);
+                })
+                .catch(err => console.error('Error fetching current serving:', err));
+        }
+
+        function setCurrentServing(uid, client) {
+            const numberEl = document.getElementById('servingNumber');
+            const nameEl = document.getElementById('servingName');
+            if (!uid) {
+                numberEl.textContent = '—';
+                nameEl.textContent = 'No one is being served';
+                return;
+            }
+            numberEl.textContent = uid;
+            if (client) {
+                nameEl.textContent = client.name || (client.email || client.phone || 'Unknown');
+            } else {
+                // try to fetch client info
+                fetch(`/api/client/${uid}`)
+                    .then(r => r.json())
+                    .then(info => {
+                        if (info && Object.keys(info).length) {
+                            nameEl.textContent = info.name || (info.email || info.phone || 'Unknown');
+                        } else {
+                            nameEl.textContent = 'Unknown';
+                        }
+                    }).catch(() => nameEl.textContent = 'Unknown');
+            }
+        }
+
+        function nextCustomer() {
+            fetch('/next')
+                .then(() => {
+                    // fetch updated serving after calling next
+                    setTimeout(fetchCurrentServing, 300);
+                })
+                .catch(err => console.error('Error:', err));
+        }
+
+        function moveUp(uid) {
+            if (confirm(`Move ${uid} up one position?`)) {
+                fetch("/move-up", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ uid: uid })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error("Error:", err);
+                    alert("Failed to move customer up");
+                });
+            }
+        }
+
+        // Initialize and refresh badges
+        initBadges();
+        setInterval(() => {
+            updateQueueBadge();
+            updateRequestsBadge();
+        }, 3000);
+
+        // Control actions for serving
+        function completeCustomer() {
+            fetch('/complete', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        // refresh queue and serving display
+                        setTimeout(() => location.reload(), 300);
+                    } else {
+                        alert('Error completing customer: ' + (data.message || 'unknown'));
+                    }
+                }).catch(err => console.error('Complete error', err));
+        }
+
+        function recallCustomer() {
+            fetch('/recall', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success) alert('Recall failed');
+                }).catch(err => console.error('Recall error', err));
+        }
+
+        function noShowCustomer() {
+            if (!confirm('Mark current customer as no-show?')) return;
+            fetch('/no-show', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        setTimeout(() => location.reload(), 300);
+                    } else {
+                        alert('Error marking no-show');
+                    }
+                }).catch(err => console.error('No-show error', err));
+        }
+
+        function refreshPage() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>

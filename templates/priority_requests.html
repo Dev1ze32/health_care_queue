@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Requests - QMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .navbar-logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-logo:hover {
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-item a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-item a.active {
+            background-color: rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+        }
+
+        .nav-btn {
+            background-color: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .request-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .request-info {
+            flex: 1;
+        }
+
+        .request-info h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .request-details {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .request-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, #4fb559 0%, #61b776 100%);
+            color: white;
+        }
+
+        .btn-approve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 181, 89, 0.3);
+        }
+
+        .btn-reject {
+            background: #f5f5f5;
+            color: #d32f2f;
+            border: 1px solid #d32f2f;
+        }
+
+        .btn-reject:hover {
+            background: #ffebee;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            background: white;
+            padding: 60px 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .empty-state h2 {
+            color: #999;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #ccc;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                gap: 15px;
+            }
+
+            .nav-item a {
+                font-size: 14px;
+            }
+
+            .page-header {
+                padding: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 24px;
+            }
+
+            .request-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .request-actions {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo">
+                PNC Healthcare System
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/home">Home</a></li>
+                <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
+                <li class="nav-item"><a href="/reports">Reports</a></li>
+                <li class="nav-item"><a href="/about">About</a></li>
+                <li class="nav-item"><a href="/display">Join</a></li>
+                <li class="nav-item"><a href="/priority-requests">Requests</a></li>
+                <li class="nav-item"><a href="/" class="nav-btn">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Priority Queue Requests</h1>
+            <p>Manage customer requests to change queue position</p>
+        </div>
+
+        <div id="requestsContainer">
+            {% if requests %}
+                {% for uid, position in requests.items() %}
+                    <div class="request-card">
+                        <div class="request-info">
+                            <h3>{{ uid }}</h3>
+                            <div class="request-details">Requested Position: <strong>{{ position }}</strong></div>
+                            <div class="request-details">Current Position: <strong id="pos-{{ uid }}">Calculating...</strong></div>
+                        </div>
+                        <div class="request-actions">
+                            <button class="btn btn-approve" onclick="approveRequest('{{ uid }}')">✓ Approve</button>
+                            <button class="btn btn-reject" onclick="rejectRequest('{{ uid }}')">✗ Reject</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <h2>No Pending Requests</h2>
+                    <p>There are currently no priority queue requests to review</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function approveRequest(uid) {
+            if (confirm(`Approve priority request for ${uid}?`)) {
+                fetch('/approve-priority', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        uid: uid,
+                        approve: true
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Successfully approved ${uid}`);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to approve request');
+                });
+            }
+        }
+
+        function rejectRequest(uid) {
+            if (confirm(`Reject priority request for ${uid}?`)) {
+                fetch('/approve-priority', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        uid: uid,
+                        approve: false
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Successfully rejected ${uid}`);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to reject request');
+                });
+            }
+        }
+
+        // Function to get current queue and update position display
+        function updateCurrentPositions() {
+            // This would need a new API endpoint to get current queue
+            // For now, we'll just display the requested position
+        }
+
+        updateCurrentPositions();
+
+        function initBadges() {
+            updateQueueBadge();
+            updateRequestsBadge();
+        }
+
+        function updateQueueBadge() {
+            fetch("/api/queue-count")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('queueBadge').textContent = data.count || 0;
+                })
+                .catch(error => console.error("Error fetching queue count:", error));
+        }
+
+        function updateRequestsBadge() {
+            fetch("/api/priority-requests")
+                .then(response => response.json())
+                .then(data => {
+                    const requestCount = Object.keys(data).length;
+                    document.getElementById('requestsBadge').textContent = requestCount;
+                })
+                .catch(error => console.error("Error fetching requests:", error));
+        }
+
+        window.addEventListener('DOMContentLoaded', initBadges);
+        setInterval(() => {
+            updateQueueBadge();
+            updateRequestsBadge();
+        }, 3000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: qms_app
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "5002:5002"
+    volumes:
+      # Keeps your QR code accessible
+      - ./static:/app/static
+      # CRUCIAL: Keeps your database safe!
+      - ./qms.db:/app/qms.db
+    restart: unless-stopped
